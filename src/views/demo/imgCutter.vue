@@ -4,6 +4,8 @@
       @cutDown="cutDown"
     >
     </ImgClipping>
+
+    <Oel-table />
   </div>
 </template>
 
