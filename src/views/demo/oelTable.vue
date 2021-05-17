@@ -1,42 +1,43 @@
 <template>
   <Oel-screen>
-    <ImgClipping
-      @cutDown="cutDown"
+    <Oel-table
+      :api="APIgetList"
+      :table-header="tableHeader"
     />
   </Oel-screen>
 </template>
 
 <script>
-import ImgClipping from 'vue-img-clipping'
+import { getList } from '@/api/demo'
 
 export default {
-  name: '',
-  components: {
-    ImgClipping
-  },
   data() {
     return {
-     
+      APIgetList: getList,
+      tableHeader: [
+        { field: 'createDate', name: '广告主题' },
+        { field: 'createdBy', name: '总点击次数' },
+        { field: 'deleteFlag', name: '0-2时' },
+        { field: 'dictCode', name: '2-4时' },
+        { field: 'dictDesc', name: '4-6时' },
+        { field: 'dictName', name: '6-8时' },
+        { field: 'dictOrder', name: '8-10时' },
+        { field: 'dictTypeCode', name: '10-12时' },
+        { field: 'dictTypeName', name: '12-14时' },
+        { field: 'lastUpdateDate', name: '14-16时' },
+        { field: 'lastUpdatedBy', name: '16-18时' },
+        { field: 'objectVersionNumber', name: '18-20时' }
+      ]
     }
   },
-
   computed: {
-   
   },
   mounted() {
-  
+  },
+  methods: {
   }
 }
 </script>
 
 <style lang="scss" scoped>
-.dashboard {
-  &-container {
-    margin: 30px;
-  }
-  &-text {
-    font-size: 30px;
-    line-height: 46px;
-  }
-}
 </style>

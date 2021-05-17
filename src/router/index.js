@@ -170,22 +170,23 @@ export const asyncRoutes = [
       {
         path: 'imgCutter',
         component: () => import('@/views/demo/imgCutter'),
-        name: 'imgCutter',
-        meta: { title: 'imgCutter' }
+        name: '图片裁剪',
+        meta: { title: '图片裁剪' }
+      },
+      {
+        path: 'oelTable',
+        component: () => import('@/views/demo/oelTable'),
+        name: '表格',
+        meta: { title: '表格' }
+      },
+      {
+        path: 'transfer',
+        component: () => import('@/views/demo/transfer'),
+        name: '穿梭框',
+        meta: { title: '穿梭框' }
       }
     ]
   },
-  // {
-  //   path: 'external-link',
-  //   component: Layout,
-  //   children: [
-  //     {
-  //       path: 'https://panjiachen.github.io/vue-element-admin-site/#/',
-  //       meta: { title: 'External Link', icon: 'link' }
-  //     }
-  //   ]
-  // },
-
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }
 ]

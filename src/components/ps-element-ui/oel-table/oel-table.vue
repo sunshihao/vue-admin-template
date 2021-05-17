@@ -1,14 +1,15 @@
 /* eslint-disable vue/no-reserved-keys */
+
 <template>
   <div>
     <el-table
-      v-loading="loading"
+      v-loading="pri_loading"
       stripe
       border
       fit
       highlight-current-row
       style="width: 100%"
-      :data="tableDataForRender"
+      :data="tableData"
       :cell-style="cellStyle"
       :max-height="tableHeight"
       :header-row-style="{ height: '30px' }"
@@ -48,7 +49,7 @@
         type="index"
         :width="numberWidth"
         align="center"
-        :label="indexLable"
+        :label="firstColumnLable"
         fixed="left"
       />
       <!-- 渲染表头 也就同时渲染表格数据 -->
@@ -57,7 +58,7 @@
         :key="idx"
         :show-overflow-tooltip="tdWrap"
         stripe
-        :align="x.align"
+        :align="x.align || 'center'"
         :formatter="x.formatter"
         :header-align="x.headerAlign"
         :label="x.name"
@@ -84,7 +85,7 @@
             v-else-if="x.operation && constructOperation(x.operation, scope.row).length > 5"
           >
             <span
-              v-for="(y, idxBtn) in _lodashSlice(constructOperation(x.operation, scope.row), 0, 2)"
+              v-for="(y, idxBtn) in pri_lodashSlice(constructOperation(x.operation, scope.row), 0, 2)"
               :key="idxBtn"
               class="btnPadding"
             >
@@ -108,7 +109,7 @@
                 </el-button>
                 <el-dropdown-menu slot="dropdown">
                   <el-dropdown-item
-                    v-for="(z, zIndex) in _lodashSlice(
+                    v-for="(z, zIndex) in pri_lodashSlice(
                       constructOperation(x.operation, scope.row),
                       2
                     )"
@@ -191,6 +192,8 @@
       :current-page.sync="page"
       :layout="layout"
       :total="totalNum"
+      @size-change="priSizeChange"
+      @current-change="priCurrentChange"
     />
   </div>
 </template>
@@ -198,22 +201,21 @@
 <script>
 /**
  * table ele常用组件封装升级 2.0 by sssh
- *   <!-- @size-change="_pageSizeChange" -->
-      <!-- @current-change="_pageIndexChange" -->
 */
 import _ from 'lodash'
 
 export default {
   name: 'OelTable',
   props: {
-    // 表格数据
-    tableData: {
-      type: Array
+    // API 接口
+    api: {
+      type: Function,
+      required: true
     },
-    // 加载中
-    loading: {
-      type: Boolean,
-      default: false
+    // 查询条件
+    queryParams: {
+      type: Object,
+      required: false
     },
     // 列名
     tableHeader: {
@@ -225,32 +227,42 @@ export default {
       type: Boolean,
       default: false
     },
+    // 序号列列名
+    firstColumnLable: {
+      type: String,
+      default: '序号'
+    },
+    // 序号列宽度
+    numberWidth: {
+      type: Number,
+      default: 50
+    },
     // 是否显示复选框
     checkboxColumn: {
       type: Boolean,
       default: false
-    },
-    // 是否显示单选框
-    radioColumn: {
-      type: Boolean,
-      default: false
-    },
-    // 序号列列名
-    indexLable: {
-      type: String,
-      default: '序号'
     },
     // 显示的标题
     checkboxLable: {
       type: String,
       default: ' '
     },
-    // 显示的标题
+    // 复选框宽度
+    checkboxWidth: {
+      type: Number,
+      default: 50
+    },
+    // 是否显示单选框
+    radioColumn: {
+      type: Boolean,
+      default: false
+    },
+    // 单选框标题
     radioLable: {
       type: String,
       default: '选择'
     },
-    // 分页
+    // 是否显示分页
     showPageable: {
       type: Boolean,
       default: true
@@ -266,8 +278,7 @@ export default {
     },
     // 列是否固定在左侧或者右侧，true 表示固定在左侧
     fixed: {
-      // eslint-disable-next-line
-      type: String | Boolean,
+      type: String || Boolean,
       default: false
     },
     // 表格高度
@@ -278,63 +289,47 @@ export default {
     layout: {
       type: String,
       default: 'total, sizes, prev, pager,next,jumper'
-    },
-    // 复选框宽度
-    checkboxWidth: {
-      type: Number,
-      default: 50
-    },
-    // 序号列宽度
-    numberWidth: {
-      type: Number,
-      default: 50
-    },
-    // 当前页数
-    curPage: {
-      type: [Number, String],
-      default: 1
-    },
-    // 当前页数
-    pageSize: {
-      type: [Number, String],
-      default: 10
-    },
-    // 数据总量
-    total: {
-      type: [Number, String],
-      default: 0
     }
   },
   data() {
     return {
-      _lodashSlice: _.slice,
-      tableDataForRender: this.tableData,
-      page: 1,
+      pri_lodashSlice: _.slice,
+      pri_loading: false,
+      tableData: [],
+      page: 1, // 分页信息
       size: 10,
       totalNum: 0,
-      tableRadio: '',
-      order: ''
+      tableRadio: ''
     }
   },
-  watch: {
-    tableData: function(newVal, oldVal) {
-      //
-      if (newVal !== oldVal) {
-        this.tableDataForRender = newVal
-      }
-    },
-    curPage: function(newVal) {
-      this.page = newVal
-    },
-    pageSize: function(newVal) {
-      this.size = newVal
-    },
-    total: function(newVal) {
-      this.totalNum = newVal
-    }
+  mounted() {
+    this.getTableData()
   },
-  mounted() {},
   methods: {
+    /** 获取表格数据 */
+    getTableData() {
+      const that = this
+      that.pri_loading = true
+      this.api({
+        curPage: this.page,
+        pageSize: this.size,
+        ...this.queryParams
+      }).then(res => {
+        that.pri_loading = false
+        const { data: {
+          records,
+          total,
+          current,
+          size
+        }, success } = res
+        if (success) {
+          that.tableData = records
+          that.page = current
+          that.size = size
+          that.totalNum = total
+        }
+      })
+    },
     constructOperation(operationArr, rowData) {
       const arr = []
       for (const i in operationArr) {
@@ -365,7 +360,7 @@ export default {
     },
     // 同table select
     select(row, selection) {
-      this.$emit('selectRow', selection)
+      this.$emit('select', selection)
     },
     clickChange(item) {
       this.tableRadio = item
@@ -390,6 +385,16 @@ export default {
     // 同table selectionChange
     selectionChange(rows) {
       this.$emit('selectionChange', rows)
+    },
+    // 总数变更
+    priSizeChange(size) {
+      this.size = size
+      this.page = 1 // 重置查询首页
+      this.getTableData()
+    },
+    priCurrentChange(page) {
+      this.page = page
+      this.getTableData()
     }
   }
 }
