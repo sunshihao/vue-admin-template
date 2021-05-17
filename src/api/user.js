@@ -22,3 +22,10 @@ export function logout() {
     method: 'post'
   })
 }
+
+export function getTestTable() {
+  return request({
+    url: '/mock/tableInfo',
+    method: 'post'
+  })
+}

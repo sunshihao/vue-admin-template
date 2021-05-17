@@ -2,7 +2,7 @@ import Vue from 'vue'
 import ElementUI from 'element-ui'
 
 import 'normalize.css/normalize.css' // A modern alternative to CSS resets
-import 'element-ui/lib/theme-chalk/index.css'
+import '@/assets/theme-chalk/index.css'
 
 import '@/styles/index.scss' // global css
 import '@/components/ps-element-ui' // 全局注册自定义组件
