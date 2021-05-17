@@ -328,6 +328,9 @@ export default {
           that.size = size
           that.totalNum = total
         }
+      }).catch(err => {
+        console.log(err)
+        that.pri_loading = false
       })
     },
     constructOperation(operationArr, rowData) {

@@ -174,7 +174,7 @@ export const asyncRoutes = [
         meta: { title: '图片裁剪' }
       },
       {
-        path: 'oelTable',
+        path: 'OelTable',
         component: () => import('@/views/demo/oelTable'),
         name: '表格',
         meta: { title: '表格' }

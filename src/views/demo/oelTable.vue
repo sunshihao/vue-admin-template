@@ -11,6 +11,7 @@
 import { getList } from '@/api/demo'
 
 export default {
+  name: 'oelTable',
   data() {
     return {
       APIgetList: getList,
