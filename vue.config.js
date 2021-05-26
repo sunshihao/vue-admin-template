@@ -30,7 +30,7 @@ module.exports = {
   lintOnSave: process.env.NODE_ENV === 'development',
   productionSourceMap: false,
   devServer: {
-    port: port,
+    port,
     open: true,
     overlay: {
       warnings: false,
@@ -41,6 +41,7 @@ module.exports = {
       // TODO 暂定代理到
       '/': {
         target: 'https://api.uat2.jomoo.cn/imax/',
+        // target: 'http://192.168.43.11:8082/', // 遥远后台直连
         changeOrigin: true,
         pathRewrite: {
           '^/dev-api': ''

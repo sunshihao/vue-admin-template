@@ -174,16 +174,28 @@ export const asyncRoutes = [
         meta: { title: '图片裁剪' }
       },
       {
-        path: 'OelTable',
+        path: 'oelTable',
         component: () => import('@/views/demo/oelTable'),
         name: '表格',
         meta: { title: '表格' }
+      },
+      {
+        path: 'iviewTable',
+        component: () => import('@/views/demo/iviewTable'),
+        name: '表格iview',
+        meta: { title: '表格iview' }
       },
       {
         path: 'transfer',
         component: () => import('@/views/demo/transfer'),
         name: '穿梭框',
         meta: { title: '穿梭框' }
+      },
+      {
+        path: 'upload',
+        component: () => import('@/views/demo/upload'),
+        name: '文件上传',
+        meta: { title: '文件上传' }
       }
     ]
   },

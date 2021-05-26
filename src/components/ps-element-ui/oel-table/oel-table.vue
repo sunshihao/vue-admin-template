@@ -1,7 +1,7 @@
 /* eslint-disable vue/no-reserved-keys */
-
 <template>
   <div>
+    <!-- 表格设置 -->
     <el-table
       v-loading="pri_loading"
       stripe
@@ -28,16 +28,16 @@
         type="selection"
         fixed="left"
         :width="checkboxWidth"
-        align="center"
         :label="checkboxLable"
+        align="center"
       />
       <!--单选框-->
       <el-table-column
         v-if="radioColumn"
         fixed="left"
         :width="checkboxWidth"
-        align="center"
         :label="radioLable"
+        align="center"
       >
         <template slot-scope="scope">
           <el-radio v-model="tableRadio" :label="scope.row"><i /></el-radio>
@@ -48,140 +48,161 @@
         v-if="firstColumn"
         type="index"
         :width="numberWidth"
-        align="center"
         :label="firstColumnLable"
+        align="center"
         fixed="left"
       />
       <!-- 渲染表头 也就同时渲染表格数据 -->
-      <el-table-column
-        v-for="(x, idx) in tableHeader"
-        :key="idx"
-        :show-overflow-tooltip="tdWrap"
-        stripe
-        :align="x.align || 'center'"
-        :formatter="x.formatter"
-        :header-align="x.headerAlign"
-        :label="x.name"
-        :prop="x.sortModel"
-        :width="x.width"
-        :min-width="x.minWidth"
-        :fixed="x.fixed ? x.fixed : false"
-        :sortable="x.sort === true ? 'custom' : false"
-      >
-        <template slot-scope="scope">
-          <template v-if="x.operation && constructOperation(x.operation, scope.row).length <= 5">
-            <el-button
-              v-for="(y, idxBtn) in constructOperation(x.operation, scope.row)"
-              :key="idxBtn"
-              type="text"
-              size="mini"
-              :style="y.style || ''"
-              @click.native.prevent="y.handle(scope.row)"
-            >
-              {{ y.name }}
-            </el-button>
+      <template v-for="(x, idx) in tableHeader">
+
+        <el-table-column
+          v-if="x.render"
+          :key="idx"
+          :show-overflow-tooltip="tdWrap"
+          stripe
+          :align="x.align || 'center'"
+          :formatter="x.formatter"
+          :header-align="x.headerAlign"
+          :label="x.name"
+          :prop="x.sortModel"
+          :width="x.width"
+          :min-width="x.minWidth"
+          :fixed="x.fixed ? x.fixed : false"
+          :sortable="x.sort === true ? 'custom' : false"
+        >
+          <template slot-scope="scope">
+            <TableRender :row="scope.row" :render="x.render" :index="scope.$index" />
           </template>
-          <template
-            v-else-if="x.operation && constructOperation(x.operation, scope.row).length > 5"
-          >
-            <span
-              v-for="(y, idxBtn) in pri_lodashSlice(constructOperation(x.operation, scope.row), 0, 2)"
-              :key="idxBtn"
-              class="btnPadding"
-            >
-              <template>
-                <el-button
-                  :key="idxBtn"
-                  size="mini"
-                  plain
-                  :style="y.style || ''"
-                  type="text"
-                  @click.native.prevent="y.handle(scope.row)"
-                >
-                  {{ y.name }}
-                </el-button>
-              </template>
-            </span>
-            <span class="btnPadding">
-              <el-dropdown placement="bottom-end" trigger="click">
-                <el-button plain icon="el-icon-more" type="text" size="mini">
-                  更多<i class="el-icon-arrow-down el-icon--right" />
-                </el-button>
-                <el-dropdown-menu slot="dropdown">
-                  <el-dropdown-item
-                    v-for="(z, zIndex) in pri_lodashSlice(
-                      constructOperation(x.operation, scope.row),
-                      2
-                    )"
-                    :key="zIndex"
-                    @click.native.prevent="z.handle(scope.row)"
-                  >{{ z.name }}</el-dropdown-item>
-                </el-dropdown-menu>
-              </el-dropdown>
-            </span>
-          </template>
-          <template v-if="x.hasOwnProperty('filter') && x.filter">
-            <template v-if="x.handle">
-              <a style="color: #4a88ea !important" @click.prevent="x.handle(scope.row)">{{
-                x.filter(scope.row[x.field], scope.row)
-              }}</a>
+        </el-table-column>
+        <el-table-column
+          v-else
+          :key="idx"
+          :show-overflow-tooltip="tdWrap"
+          stripe
+          :align="x.align || 'center'"
+          :formatter="x.formatter"
+          :header-align="x.headerAlign"
+          :label="x.name"
+          :prop="x.sortModel"
+          :width="x.width"
+          :min-width="x.minWidth"
+          :fixed="x.fixed ? x.fixed : false"
+          :sortable="x.sort === true ? 'custom' : false"
+        >
+          <template slot-scope="scope">
+            <template v-if="x.operation && constructOperation(x.operation, scope.row).length <= 5">
+              <el-button
+                v-for="(y, idxBtn) in constructOperation(x.operation, scope.row)"
+                :key="idxBtn"
+                type="text"
+                size="mini"
+                :style="y.style || ''"
+                @click.native.prevent="y.handle(scope.row)"
+              >
+                {{ y.name }}
+              </el-button>
             </template>
-            <template v-else>
-              <span>{{ x.filter(scope.row[x.field], scope.row) }}</span>
-            </template>
-          </template>
-          <template v-else>
-            <template v-if="x.handle">
-              <a style="color: #4a88ea !important" @click.prevent="x.handle(scope.row)">{{
-                scope.row[x.field]
-              }}</a>
-            </template>
-            <template v-else-if="x.formatter">
-              <span>
-                {{ x.formatter(scope.row[x.field]) }}
-              </span>
-            </template>
-            <template v-else-if="x.editable">
-              <span v-if="scope.row.isEdit">
-                <div v-if="x.editType == 'select'">
-                  <el-select v-model="scope.row[x.field]" size="small" placeholder="请选择">
-                    <div v-if="x.selectOptionList">
-                      <el-option
-                        v-for="(item, index) in x.selectOptionList()"
-                        :key="index"
-                        :value="item.value"
-                        :label="item.label"
-                      >{{ item.label }}</el-option>
-                    </div>
-                    <div v-else>
-                      <el-option value="1">1</el-option>
-                    </div>
-                  </el-select>
-                </div>
-                <div v-else>
-                  <el-input
-                    v-model="scope.row[x.field]"
-                    size="small"
-                    placeholder="请输入"
-                  />
-                </div>
-              </span>
-              <span v-else>
-                <div v-if="x.editType == 'select'">
-                  {{ fmtSelect(scope.row[x.field], x.selectOptionList()) }}
-                </div>
-                <div v-else>{{ scope.row[x.field] }}</div>
-              </span>
-            </template>
-            <template v-else>
+            <template v-else-if="x.operation && constructOperation(x.operation, scope.row).length > 5">
               <span
-                :style="{ color: typeof x.color == 'function' ? x.color(scope.row) : x.color }"
-              >{{ scope.row[x.field] }}</span>
+                v-for="(y, idxBtn) in pri_lodashSlice(constructOperation(x.operation, scope.row), 0, 2)"
+                :key="idxBtn"
+                class="btnPadding"
+              >
+                <template>
+                  <el-button
+                    :key="idxBtn"
+                    size="mini"
+                    plain
+                    :style="y.style || ''"
+                    type="text"
+                    @click.native.prevent="y.handle(scope.row)"
+                  >
+                    {{ y.name }}
+                  </el-button>
+                </template>
+              </span>
+              <span class="btnPadding">
+                <el-dropdown placement="bottom-end" trigger="click">
+                  <el-button plain icon="el-icon-more" type="text" size="mini">
+                    更多<i class="el-icon-arrow-down el-icon--right" />
+                  </el-button>
+                  <el-dropdown-menu slot="dropdown">
+                    <el-dropdown-item
+                      v-for="(z, zIndex) in pri_lodashSlice(
+                        constructOperation(x.operation, scope.row),
+                        2
+                      )"
+                      :key="zIndex"
+                      @click.native.prevent="z.handle(scope.row)"
+                    >{{ z.name }}</el-dropdown-item>
+                  </el-dropdown-menu>
+                </el-dropdown>
+              </span>
+            </template>
+            <template v-if="x.hasOwnProperty('filter') && x.filter">
+              <template v-if="x.handle">
+                <a style="color: #4a88ea !important" @click.prevent="x.handle(scope.row)">{{
+                  x.filter(scope.row[x.field], scope.row)
+                }}</a>
+              </template>
+              <template v-else>
+                <span>{{ x.filter(scope.row[x.field], scope.row) }}</span>
+              </template>
+            </template>
+            <template v-else>
+              <template v-if="x.handle">
+                <a style="color: #4a88ea !important" @click.prevent="x.handle(scope.row)">{{
+                  scope.row[x.field]
+                }}</a>
+              </template>
+              <template v-else-if="x.formatter">
+                <span>
+                  {{ x.formatter(scope.row[x.field]) }}
+                </span>
+              </template>
+              <template v-else-if="x.editable">
+                <span v-if="scope.row.isEdit">
+                  <div v-if="x.editType == 'select'">
+                    <el-select v-model="scope.row[x.field]" size="small" placeholder="请选择">
+                      <div v-if="x.selectOptionList">
+                        <el-option
+                          v-for="(item, index) in x.selectOptionList()"
+                          :key="index"
+                          :value="item.value"
+                          :label="item.label"
+                        >{{ item.label }}</el-option>
+                      </div>
+                      <div v-else>
+                        <el-option value="1">1</el-option>
+                      </div>
+                    </el-select>
+                  </div>
+                  <div v-else>
+                    <el-input
+                      v-model="scope.row[x.field]"
+                      size="small"
+                      placeholder="请输入"
+                    />
+                  </div>
+                </span>
+                <span v-else>
+                  <div v-if="x.editType == 'select'">
+                    {{ fmtSelect(scope.row[x.field], x.selectOptionList()) }}
+                  </div>
+                  <div v-else>{{ scope.row[x.field] }}</div>
+                </span>
+              </template>
+              <template v-else>
+                <span
+                  :style="{ color: typeof x.color == 'function' ? x.color(scope.row) : x.color }"
+                >{{ scope.row[x.field] }}</span>
+              </template>
             </template>
           </template>
-        </template>
-      </el-table-column>
+        </el-table-column>
+      </template>
     </el-table>
+    <!-- 分页设置 -->
     <el-pagination
       v-if="showPageable"
       background
@@ -192,6 +213,7 @@
       :current-page.sync="page"
       :layout="layout"
       :total="totalNum"
+      :disabled="pri_loading"
       @size-change="priSizeChange"
       @current-change="priCurrentChange"
     />
@@ -203,9 +225,10 @@
  * table ele常用组件封装升级 2.0 by sssh
 */
 import _ from 'lodash'
+import TableRender from './table-render.js'
 
 export default {
-  name: 'OelTable',
+  components: { TableRender },
   props: {
     // API 接口
     api: {
@@ -334,6 +357,9 @@ export default {
       })
     },
     constructOperation(operationArr, rowData) {
+      console.log('operationArr', operationArr)
+      console.log('rowData', rowData)
+
       const arr = []
       for (const i in operationArr) {
         if (

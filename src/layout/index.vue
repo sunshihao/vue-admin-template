@@ -73,9 +73,11 @@ export default {
 .app-wrapper {
   @include clearfix;
 
-  height: calc(100% - 50px);
+  // height: calc(100% - 50px);
+  height: 100%;
   overflow-y: hidden;
-  /* width: 100%; */
+  position: fixed;
+  width: 100%; // upd by sssh
   /* margin-top: 50px; */
 
   &.mobile.openSidebar {

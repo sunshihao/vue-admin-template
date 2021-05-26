@@ -20,6 +20,7 @@ service.interceptors.request.use(
       // ['X-Token'] is a custom headers key
       // please modify it according to the actual situation
       config.headers['skipTokenAuthorize'] = 'true'
+      config.headers['Content-Type'] = 'multipart/form-data'
       config.headers['X-Token'] = getToken()
     }
     return config
