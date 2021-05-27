@@ -180,12 +180,6 @@ export const asyncRoutes = [
         meta: { title: '表格' }
       },
       {
-        path: 'iviewTable',
-        component: () => import('@/views/demo/iviewTable'),
-        name: '表格iview',
-        meta: { title: '表格iview' }
-      },
-      {
         path: 'transfer',
         component: () => import('@/views/demo/transfer'),
         name: '穿梭框',
