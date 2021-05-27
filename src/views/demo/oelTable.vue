@@ -27,7 +27,7 @@ export default {
         { field: 'dictName', name: '有效期截止' },
         { name: '直播权限', render: ({ row, index }) => <el-switch value={row.id || row.id === 1} active-color={'#13ce66'} inactive-color={'#ff4949'} onChange={() => that.onSwitchChange(row)} /> },
         { name: '选择器样例', render: ({ row, index }) =>
-          <el-select value={row.dictName} filterable placeholder='请选择' onChange={(e) => that.onSelChange(e, row)} >
+          <el-select value={row.dictName} filterable clearable placeholder='请选择' onChange={(e) => that.onSelChange(e, row)} onClear={(e) => that.onClearData(e, row)} >
             {
               that.options.map(
                 item =>
@@ -101,6 +101,9 @@ export default {
     onSelChange(data, row) {
       console.log('onSelChange', data)
       row.dictName = data
+    },
+    onClearData(data, row) {
+      console.log('onClearData', data)
     }
   }
 }
