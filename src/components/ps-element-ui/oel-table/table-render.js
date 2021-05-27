@@ -12,11 +12,11 @@ export default {
   },
   render: (h, ctx) => {
     const params = {
-      row: ctx.props.row,
-      index: ctx.props.index || 1
+      row: ctx.props.row, // 当前行数据
+      index: ctx.props.index // 当前行索引
     }
     if (ctx.props.column) params.column = ctx.props.column
-    return ctx.props.render(h, params)
+    return ctx.props.render({ ...params })
     // return <div domPropsInnerHTML={ctx.props.render(h, params)} />
   }
 }

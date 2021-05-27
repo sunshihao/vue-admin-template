@@ -357,8 +357,8 @@ export default {
       })
     },
     constructOperation(operationArr, rowData) {
-      console.log('operationArr', operationArr)
-      console.log('rowData', rowData)
+      // console.log('operationArr', operationArr)
+      // console.log('rowData', rowData)
 
       const arr = []
       for (const i in operationArr) {
